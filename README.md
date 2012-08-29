@@ -42,7 +42,7 @@ php oil refine migrate:up --packages=dbacl
   * or manually importing shema.sql
 
 ## Configuration
-Apart of obvious settings you can decide which users are being treated as _superusers_ with access to anything without even checking is resource / role exists.
+Apart of obvious settings you can decide which users are being treated as _superusers_ with access to anything without even checking if resource / role exists.
 In this example, users with ID 1 and 2 have access to anything with no further checks:
 <pre>
 'superusers' => array(1, 2),
