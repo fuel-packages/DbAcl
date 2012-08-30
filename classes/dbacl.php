@@ -83,7 +83,7 @@ class DbAcl extends \Auth
 
 		//Does the $role exists in given namespace?
 		$role = \DB::select()
-					->from(\Config::get('dbacl.table.roles', 'role'))
+					->from(\Config::get('dbacl.table.roles', 'dbacl_role'))
 					->where('name', $role_name)
 					->and_where('namespace', $namespace)->execute(\Config::get('dbacl.connection', null))->current();
 		if (empty($role))
@@ -91,15 +91,15 @@ class DbAcl extends \Auth
 			return false;
 		}
 
-		//Find permission to resource with $role within all groups that user delongs to
-		$groups_permissions = \DB::query('SELECT COUNT(*) AS count FROM `'.\Config::get('dbacl.table.users_groups', 'user_group').'`, `'.\Config::get('dbacl.table.groups_permissions', 'group_permission').'`, `'.\Config::get('dbacl.table.resources', 'resource').'`
-							WHERE '.\Config::get('dbacl.table.users_groups', 'user_group').'.user_id = '.static::$_user_id.'
-							AND '.\Config::get('dbacl.table.users_groups', 'user_group').'.group_id = '.\Config::get('dbacl.table.groups_permissions', 'group_permission').'.group_id
-							AND '.\Config::get('dbacl.table.resources', 'resource').'.namespace = '.\DB::escape($namespace).'
-							AND '.\Config::get('dbacl.table.resources', 'resource').'.class = '.\DB::escape($class).'
-							AND '.\Config::get('dbacl.table.resources', 'resource').'.method = '.\DB::escape($method).'
-							AND '.\Config::get('dbacl.table.groups_permissions', 'group_permission').'.resource_id = '.\Config::get('dbacl.table.resources', 'resource').'.id
-							AND '.\Config::get('dbacl.table.groups_permissions', 'group_permission').'.role_id = '.$role['id'].'
+		//Find permission to resource with $role within all groups that user belongs to
+		$groups_permissions = \DB::query('SELECT COUNT(*) AS count FROM `'.\Config::get('dbacl.table.users_groups', 'dbacl_user_group').'`, `'.\Config::get('dbacl.table.groups_permissions', 'dbacl_group_permission').'`, `'.\Config::get('dbacl.table.resources', 'dbacl_resource').'`
+							WHERE '.\Config::get('dbacl.table.users_groups', 'dbacl_user_group').'.user_id = '.static::$_user_id.'
+							AND '.\Config::get('dbacl.table.users_groups', 'dbacl_user_group').'.group_id = '.\Config::get('dbacl.table.groups_permissions', 'dbacl_group_permission').'.group_id
+							AND '.\Config::get('dbacl.table.resources', 'dbacl_resource').'.namespace = '.\DB::escape($namespace).'
+							AND '.\Config::get('dbacl.table.resources', 'dbacl_resource').'.class = '.\DB::escape($class).'
+							AND '.\Config::get('dbacl.table.resources', 'dbacl_resource').'.method = '.\DB::escape($method).'
+							AND '.\Config::get('dbacl.table.groups_permissions', 'dbacl_group_permission').'.resource_id = '.\Config::get('dbacl.table.resources', 'dbacl_resource').'.id
+							AND '.\Config::get('dbacl.table.groups_permissions', 'dbacl_group_permission').'.role_id = '.$role['id'].'
 							')->execute(\Config::get('dbacl.connection', null))->current();
 		if ((int)$groups_permissions['count'] > 0)
 		{
@@ -109,13 +109,13 @@ class DbAcl extends \Auth
 		}
 
 		//Get direct user's permissions for resource with $role
-		$user_permissions = \DB::query('SELECT COUNT(*) AS count FROM `'.\Config::get('dbacl.table.users_permissions', 'user_permission').'`, `'.\Config::get('dbacl.table.resources', 'resource').'`
-							WHERE '.\Config::get('dbacl.table.users_permissions', 'user_permission').'.user_id = '.static::$_user_id.'
-							AND '.\Config::get('dbacl.table.resources', 'resource').'.namespace = '.\DB::escape($namespace).'
-							AND '.\Config::get('dbacl.table.resources', 'resource').'.class = '.\DB::escape($class).'
-							AND '.\Config::get('dbacl.table.resources', 'resource').'.method = '.\DB::escape($method).'
-							AND '.\Config::get('dbacl.table.users_permissions', 'user_permission').'.resource_id = '.\Config::get('dbacl.table.resources', 'resource').'.id
-							AND '.\Config::get('dbacl.table.users_permissions', 'guser_permission').'.role_id = '.$role['id'].'
+		$user_permissions = \DB::query('SELECT COUNT(*) AS count FROM `'.\Config::get('dbacl.table.users_permissions', 'dbacl_user_permission').'`, `'.\Config::get('dbacl.table.resources', 'dbacl_resource').'`
+							WHERE '.\Config::get('dbacl.table.users_permissions', 'dbacl_user_permission').'.user_id = '.static::$_user_id.'
+							AND '.\Config::get('dbacl.table.resources', 'dbacl_resource').'.namespace = '.\DB::escape($namespace).'
+							AND '.\Config::get('dbacl.table.resources', 'dbacl_resource').'.class = '.\DB::escape($class).'
+							AND '.\Config::get('dbacl.table.resources', 'dbacl_resource').'.method = '.\DB::escape($method).'
+							AND '.\Config::get('dbacl.table.users_permissions', 'dbacl_user_permission').'.resource_id = '.\Config::get('dbacl.table.resources', 'dbacl_resource').'.id
+							AND '.\Config::get('dbacl.table.users_permissions', 'dbacl_guser_permission').'.role_id = '.$role['id'].'
 							')->execute(\Config::get('dbacl.connection', null))->current();
 		if ((int)$user_permissions['count'] > 0)
 		{
@@ -131,7 +131,7 @@ class DbAcl extends \Auth
 	/**
 	 * Runs filter_var with given REGEX at given string.
 	 *
-	 * @param   String  rext that should be validated
+	 * @param   String  text that should be validated
 	 * @param   String  regex expressions to apply
 	 * @return  bool
 	 */
