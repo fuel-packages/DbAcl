@@ -33,7 +33,7 @@ class DbAcl extends \Auth
 	public static function _init()
 	{
 		//init Auth class if it wasn't called yet
-		if (is_null(static::$_instance))
+		if (is_null(parent::$_instance))
 		{
 			parent::_init();
 		}
