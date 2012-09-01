@@ -16,7 +16,6 @@ class Init
 
     function up()
     {
-		\Config::load('dbacl', true);
         \DBUtil::create_table(\Config::get('dbacl.table.groups', 'dbacl_group'), array(
             'id' => array('type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true),
             'name' => array('type' => 'varchar', 'constraint' => 128),
