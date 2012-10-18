@@ -141,6 +141,41 @@ class DbAcl extends \Auth
 
 		return $v === false ? false : true;
 	}
+
+	/**
+	 * Returns the role name of the given user id.
+	 *
+	 * @param   int  id of the user
+	 * @return  string|bool
+	 */
+	public static function get_role_name($id = null)
+	{
+		$user = \Auth::get_user_id();
+		($id) ? $id = $id : $id = $user[1];		
+		$user_role = \DB::select()
+					->from( \Config::get('dbacl.table.users_groups', 'dbacl_user_group') )
+					->where( 'user_id', $id )
+					->execute(\Config::get('dbacl.connection', null))->current();
+					
+		if (\DB::count_last_query() > 0)
+		{
+			$group_permission = \DB::select('role_id')
+					->from( \Config::get('dbacl.table.groups_permissions', 'dbacl_group_permission') )
+					->where('group_id', $user_role['group_id'])
+					->execute(\Config::get('dbacl.connection', null))->current();
+		}
+		
+		if (\DB::count_last_query() > 0)
+		{
+			$role = \DB::select('name')
+					->from( \Config::get('dbacl.table.roles', 'dbacl_role') )
+					->where('id', $group_permission['role_id'])
+					->execute(\Config::get('dbacl.connection', null))->current();
+		}
+		
+		(\DB::count_last_query() > 0) ? $result = $role['name'] : $result = false;
+		return $result;			
+	}
 }
 
 /* end of file dbacl.php */
